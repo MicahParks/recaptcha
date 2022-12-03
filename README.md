@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/MicahParks/recaptcha)](https://goreportcard.com/report/github.com/MicahParks/recaptcha) [![Go Reference](https://pkg.go.dev/badge/github.com/MicahParks/recaptcha.svg)](https://pkg.go.dev/github.com/MicahParks/recaptcha)
+
 # recaptcha
 
 The purpose of this package is to provide a simple interface to the Google reCAPTCHA V3 service for verifying requests
