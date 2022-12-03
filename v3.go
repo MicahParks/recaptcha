@@ -100,7 +100,7 @@ type recaptchaVerifierV3 struct {
 // NewVerifierV3 creates a new reCAPTCHA V3 verifier.
 func NewVerifierV3(secret string, options VerifierV3Options) VerifierV3 {
 	httpClient := http.DefaultClient
-	if httpClient != nil {
+	if options.HTTPClient != nil {
 		httpClient = options.HTTPClient
 	}
 	verifyURL := "https://www.google.com/recaptcha/api/siteverify"
