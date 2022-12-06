@@ -197,11 +197,3 @@ func TestNewTestVerifierV3(t *testing.T) {
 		t.Fatalf("The response was not as expected.\n  Expected: %#v\n  Got: %#v", expected, resp)
 	}
 }
-
-func strSet(strs ...string) map[string]struct{} {
-	set := make(map[string]struct{})
-	for _, str := range strs {
-		set[str] = struct{}{}
-	}
-	return set
-}
