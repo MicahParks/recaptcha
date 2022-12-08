@@ -20,6 +20,9 @@ import (
 var (
 	// ErrCheck indicates that the reCAPTCHA response failed a check.
 	ErrCheck = errors.New("reCAPTCHA check failed")
+
+	// ErrInvalidVerifyInputs indicates that the reCAPTCHA V3 verify inputs are invalid.
+	ErrInvalidVerifyInputs = errors.New("reCAPTCHA V3 verify inputs are invalid")
 )
 
 // VerifierV3Options are the options for creating a new reCAPTCHA V3 verifier. All fields can safely be left blank.
@@ -116,10 +119,17 @@ func NewVerifierV3(secret string, options VerifierV3Options) VerifierV3 {
 
 // Verify helps implement the VerifierV3 interface.
 func (verifier recaptchaVerifierV3) Verify(ctx context.Context, response string, remoteIP string) (V3Response, error) {
+	if response == "" {
+		return V3Response{}, fmt.Errorf("%w: response (g-recaptcha-response from client) is an empty string", ErrInvalidVerifyInputs)
+	}
+
 	form := url.Values{
 		"secret":   {verifier.secret},
 		"response": {response},
-		"remoteip": {remoteIP},
+	}
+
+	if remoteIP != "" {
+		form.Set("remoteip", remoteIP)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, verifier.verifyURL, strings.NewReader(form.Encode()))
@@ -164,7 +174,7 @@ func NewTestVerifierV3(response V3Response, err error) VerifierV3 {
 }
 
 // Verify helps implement the VerifierV3 interface.
-func (t testVerifierV3) Verify(ctx context.Context, response string, remoteIP string) (V3Response, error) {
+func (t testVerifierV3) Verify(_ context.Context, _ string, _ string) (V3Response, error) {
 	return t.response, t.err
 }
 
