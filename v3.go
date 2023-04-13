@@ -10,7 +10,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -62,19 +61,19 @@ func (resp V3Response) Check(options V3ResponseCheckOptions) error {
 	if !resp.Success {
 		return fmt.Errorf("%w: reCAPTCHA response success is false", ErrCheck)
 	}
-	if options.APKPackageName != nil {
+	if len(options.APKPackageName) != 0 {
 		ok := inSlice(resp.APKPackageName, options.APKPackageName)
 		if !ok {
 			return fmt.Errorf("%w: APK package name %q not in set", ErrCheck, resp.APKPackageName)
 		}
 	}
-	if options.Action != nil {
+	if len(options.Action) != 0 {
 		ok := inSlice(resp.Action, options.Action)
 		if !ok {
 			return fmt.Errorf("%w: action %q not in set", ErrCheck, resp.Action)
 		}
 	}
-	if options.Hostname != nil {
+	if len(options.Hostname) != 0 {
 		ok := inSlice(resp.Hostname, options.Hostname)
 		if !ok {
 			return fmt.Errorf("%w: hostname %q not in set", ErrCheck, resp.Hostname)
@@ -145,13 +144,8 @@ func (verifier recaptchaVerifierV3) Verify(ctx context.Context, response string,
 	//goland:noinspection GoUnhandledErrorResult
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return V3Response{}, fmt.Errorf("failed to read reCAPTCHA V3 response: %w", err)
-	}
-
 	var r V3Response
-	err = json.Unmarshal(body, &r)
+	err = json.NewDecoder(resp.Body).Decode(&r)
 	if err != nil {
 		return V3Response{}, fmt.Errorf("failed to parse reCAPTCHA V3 JSON response: %w", err)
 	}
